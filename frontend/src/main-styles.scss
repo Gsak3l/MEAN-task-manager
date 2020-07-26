@@ -1,0 +1,32 @@
+// Global Styles and Variale Names
+
+// Importing Font"
+@import url('https://fonts.googleapis.com/css2?family=Lobster&display=swap');
+
+
+// Colors
+$turquoise: #44ddd0;
+$green: #27d7a1;
+$light_green: #45f69e;
+$light: #f8f8f8;
+$dark_green: #006450;
+
+// Updating Bulma's Global Variables
+$family-sans-serif: 'Lobster', sans-serif;
+$primary: $green;
+$link: $light_green;
+
+// Updating Some of Bulma's Component Variables
+$control-border-width: 2px;
+$input-border-color: transparent;
+$input-shadow: none;
+
+// Setting Custom Global Styles
+html {
+  background: linear-gradient(to right top, $turquoise, $green);
+}
+
+html,
+body {
+  height: 100%;
+}

@@ -1,5 +1,6 @@
 // Importing Main Styles
 @import '../../../main-styles.scss';
+
 // Centered Content Style
 .centered-content {
   display: flex;
@@ -32,12 +33,12 @@
 .task-list-container {
   display: flex;
   flex-grow: 1;
+  flex-direction: column;
   padding: 42px;
   border-top-right-radius: 8px;
   border-bottom-right-radius: 8px;
 }
 
-//
 .title {
   font-family: 'Nunito';
   font-size: 24px;
@@ -45,6 +46,7 @@
   letter-spacing: 2px;
 }
 
+// List Menu
 .list-menu {
   display: flex;
   flex-direction: column;
@@ -65,5 +67,36 @@
       background: $light;
     }
 
+    &.is-active {
+      background-color: #cff8ef;
+      color: $dark_green;
+    }
+
+  }
+}
+
+// Task
+.task {
+  background: #fff;
+  padding: 15px 20px;
+  border-radius: 5px;
+  margin-top: 10px;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+  cursor: pointer;
+
+  &:not(.complete) {
+    &:hover {
+      box-shadow: 0 0 0 5px #eeeeee; // 5px Spread with this Color
+    }
+
+    &:active {
+      transform: scale(0.95);
+    }
+  }
+
+  // Completed Tasks
+  &.complete {
+    text-decoration: line-through;
+    opacity: 0.8;
   }
 }

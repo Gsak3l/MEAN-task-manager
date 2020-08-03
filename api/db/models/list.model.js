@@ -11,6 +11,6 @@ const ListSchema = new mongoose.Schema({
 });
 
 // Creating the Model
-const List = mongoose.Model('List', ListSchema);
+const List = mongoose.model('List', ListSchema);
 
 module.exports = { List }

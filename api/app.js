@@ -1,10 +1,16 @@
 // Loading Express into our Javascript
-const express = require("express");
+const express = require('express');
 const app = express();
 
-/*==========Loading the Mongoose Models==========*/
-const {List, Task} = require('./db/models')
+const mongoose = require('./db/mongoose')
 
+const body_parser = require('body-parser');
+
+/*==========Loading the Mongoose Models==========*/
+const { List, Task } = require('./db/models');
+
+// Load Middleware
+app.use(body_parser.json());
 
 /*==========Route Handlers==========*/
 
@@ -12,14 +18,24 @@ const {List, Task} = require('./db/models')
 // GET/Lists → Purpose: Get All Lists
 app.get('/lists', (req, res) => {
     // This Should Return an Array with all the Lists in the Database
-    res.send("Get the World!");
+    List.find({}).then((lists) => {
+        res.send(lists)
+    });
 });
 
 // POST/Lists → Purpose: Creates a new List
 app.post('/lists', (req, res) => {
     // This Should Create a new List, and Return the new List Document + the id
     // The List Information will be Passed by the JSON Request Body
-    res.send("Post the World!");
+    let title = req.body.title;
+
+    let new_list = new List({
+        title
+    });
+    new_list.save().then((listDoc) =>{
+        // The Full List Document is Returned
+        res.send(listDoc);
+    });
 });
 
 // PATCH/lists/:id → Update a Specified List
@@ -36,5 +52,5 @@ app.delete('/lists/:id', (req, res) => {
 
 // To Make Sure that the App is Working
 app.listen(3000, () => {
-    console.log("Server is Listening on Port:3000");
+    console.log("Connected to MongoDB Successfully :)");
 });

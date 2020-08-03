@@ -32,7 +32,7 @@ app.post('/lists', (req, res) => {
     let new_list = new List({
         title
     });
-    new_list.save().then((listDoc) =>{
+    new_list.save().then((listDoc) => {
         // The Full List Document is Returned
         res.send(listDoc);
     });
@@ -41,7 +41,7 @@ app.post('/lists', (req, res) => {
 // PATCH/lists/:id → Update a Specified List
 app.patch('/lists/:id', (req, res) => {
     // This Should Update the Specified List, with the new Values Specified in the JSON Body of the Request
-    List.findOneAndUpdate({_id: req.params.id}, {
+    List.findOneAndUpdate({ _id: req.params.id }, {
         $set: req.body // This will Update the List that it finds, with the Contect of the req.body Object (user sends this)
     }).then(() => {
         res.sendStatus(200); // Not Sending Back what the User Typed
@@ -51,7 +51,11 @@ app.patch('/lists/:id', (req, res) => {
 // DELETE/lists:id → Delete a Specified List
 app.delete('/lists/:id', (req, res) => {
     // This Should Delete the Specified List
-    res.send("Delete the World!");
+    List.findOneAndRemove({
+        _id: req.params.id
+    }).then((removedListDoc) => {
+        res.send(removedListDoc)
+    });
 });
 
 // To Make Sure that the App is Working

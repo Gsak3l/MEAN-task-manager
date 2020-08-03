@@ -8,6 +8,7 @@ const body_parser = require('body-parser');
 
 /*==========Loading the Mongoose Models==========*/
 const { List, Task } = require('./db/models');
+const taskModel = require('./db/models/task.model');
 
 // Load Middleware
 app.use(body_parser.json());
@@ -57,6 +58,34 @@ app.delete('/lists/:id', (req, res) => {
         res.send(removedListDoc)
     });
 });
+
+
+/*==========Task Routes==========*/
+
+// GET /lists/:listId/tasks → Getting all Tasks in a Specific List
+app.get('/lists/:listId/tasks', (req, res) => {
+    // This Should Return All Tasks that Belong to a Specific List
+    Task.find({
+        _listId: req.params.listId
+    }).then((tasks) => {
+        res.send(tasks);
+    })
+});
+
+// POST /lists/:listId/tasks → Creating a new Task in a Specific List
+app.post('/lists/:listId/tasks', (req, res) => {
+    // This Should Create a New Task in a List Specified by the listId
+    let newTask = new Task({
+        title: req.body.title,
+        _listId: req.params.listId
+    });
+    newTask.save().then((newTaskDoc) => {
+        res.send(newTaskDoc);
+    });
+});
+
+
+/*==========OTHER STUFF, NO COMMENT FOR NOW==========*/
 
 // To Make Sure that the App is Working
 app.listen(3000, () => {

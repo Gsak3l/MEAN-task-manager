@@ -77,6 +77,16 @@ app.get('/lists/:listId/tasks', (req, res) => {
     })
 });
 
+// GET /lists/:listId/tasks/:taskId → Getting a Single Task Specified by the Id
+app.get('/lists/:listId/tasks/:taskId', (req, res) => {
+    Task.findOne({
+        _id: req.params.taskId,
+        _listId: req.params.listId
+    }).then((task) => {
+        res.send(task);
+    });
+});
+
 // POST /lists/:listId/tasks → Creating a new Task in a Specific List
 app.post('/lists/:listId/tasks', (req, res) => {
     // This Should Create a New Task in a List Specified by the listId
@@ -105,7 +115,7 @@ app.patch('/lists/:listId/tasks/:taskId', (req, res) => {
 // DELETE /lists/:listId/tasks/:taskId → Deleting an Existing Task
 app.delete('/lists/:listId/tasks/:taskId', (req, res) => {
     Task.findOneAndRemove({
-        _id: req.params.taskId, 
+        _id: req.params.taskId,
         _listId: req.params.listId
     }).then((removedTaskDocument) => {
         res.send(removedTaskDocument);

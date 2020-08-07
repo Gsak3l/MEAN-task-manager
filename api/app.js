@@ -7,7 +7,10 @@ const mongoose = require('./db/mongoose')
 const body_parser = require('body-parser');
 
 /*==========Loading the Mongoose Models==========*/
-const { List, Task } = require('./db/models');
+const {
+    List,
+    Task
+} = require('./db/models');
 const taskModel = require('./db/models/task.model');
 
 // Load Middleware
@@ -42,7 +45,9 @@ app.post('/lists', (req, res) => {
 // PATCH/lists/:id → Update a Specified List
 app.patch('/lists/:id', (req, res) => {
     // This Should Update the Specified List, with the new Values Specified in the JSON Body of the Request
-    List.findOneAndUpdate({ _id: req.params.id }, {
+    List.findOneAndUpdate({
+        _id: req.params.id
+    }, {
         $set: req.body // This will Update the List that it finds, with the Contect of the req.body Object (user sends this)
     }).then(() => {
         res.sendStatus(200); // Not Sending Back what the User Typed
@@ -82,6 +87,19 @@ app.post('/lists/:listId/tasks', (req, res) => {
     newTask.save().then((newTaskDoc) => {
         res.send(newTaskDoc);
     });
+});
+
+// PATCH /lists/:listId/tasks/:taskId → Updating an Existing Task
+app.patch('/lists/:listId/tasks/:taskId', (req, res) => {
+    // This Should Update an Existing Task Specified by the Id
+    Task.findOneAndUpdate({
+        _id: req.params.taskId,
+        _listId: req.params.listId
+    }, {
+        $set: req.body
+    }).then(() => {
+        res.sendStatus(200);
+    })
 });
 
 

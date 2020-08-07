@@ -102,6 +102,16 @@ app.patch('/lists/:listId/tasks/:taskId', (req, res) => {
     })
 });
 
+// DELETE /lists/:listId/tasks/:taskId → Deleting an Existing Task
+app.delete('/lists/:listId/tasks/:taskId', (req, res) => {
+    Task.findOneAndRemove({
+        _id: req.params.taskId, 
+        _listId: req.params.listId
+    }).then((removedTaskDocument) => {
+        res.send(removedTaskDocument);
+    });
+});
+
 
 /*==========OTHER STUFF, NO COMMENT FOR NOW==========*/
 

@@ -8,9 +8,10 @@ export class WebRequestService {
 
   readonly ROOT_URL;
 
+  // Constructor
   constructor(private http: HttpClient) {
-    this.ROOT_URL = 'http://localhost:4200/';
-  };
+    this.ROOT_URL = 'http://localhost:3000';
+  }
 
   // This is Used to Send Get Requests to the Database
   get(uri: string) {
@@ -21,7 +22,7 @@ export class WebRequestService {
   post(uri: string, payload: Object) {
     return this.http.post(`${this.ROOT_URL}/${uri}`, payload);
   };
-  
+
   // This is Used to Send Get Requests to the Database
   patch(uri: string, payload: Object) {
     return this.http.patch(`${this.ROOT_URL}/${uri}`, payload);

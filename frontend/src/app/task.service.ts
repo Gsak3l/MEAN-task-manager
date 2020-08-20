@@ -14,6 +14,12 @@ export class TaskService {
   }
 
   getLists() {
+    // This Should Send a Web Requests With all the Lists on the Database
     return this.webReqService.get('lists');
+  }
+
+  getTasks(listId: string) {
+    // This Should Send a Web Requests With all the Tasks for all the Lists on the Database
+    return this.webReqService.get(`lists/${listId}/tasks`);
   }
 }

@@ -7,20 +7,11 @@
 
       <!--menu item-->
       <div class="list-menu">
-        <a class="list-menu-item">
-          <p>list #1</p>
-        </a>
-        <a class="list-menu-item is-active">
-          <p>list #1</p>
-        </a>
-        <a class="list-menu-item">
-          <p>list #1</p>
-        </a>
-        <a class="list-menu-item">
-          <p>list #1</p>
-        </a>
-        <a class="list-menu-item">
-          <p>list #1</p>
+
+        <!--for loop for each list-->
+        <a class="list-menu-item" *ngFor="let list of lists" [routerLink]="['/lists', list._id]"
+          routerLinkActive="is-active">
+          <p>{{ list.title }}</p>
         </a>
       </div>
 
@@ -37,18 +28,13 @@
       <div class="task">
         <p>This is something I have to do</p>
       </div>
-      <div class="task">
-        <p>This is something I have to do</p>
+
+      <!--for loop for each task in each list-->
+      <div class="task" *ngFor="let task of tasks">
+        <p>{{ task.title }}</p>
       </div>
-      <div class="task">
-        <p>This is something I have to do</p>
-      </div>
-      <div class="task complete">
-        <p>This is something I have to do</p>
-      </div>
-      <div class="task complete">
-        <p>This is something I have to do</p>
-      </div>
+
+
 
 
     </div>

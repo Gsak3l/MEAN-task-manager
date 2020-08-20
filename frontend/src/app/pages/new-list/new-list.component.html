@@ -4,18 +4,16 @@
       Create a new List
     </h1>
 
-    <div class="field is-grouped">
-      <p class="control is-expanded">
-        <input class="input has-background-light is-medium" type="text" placeholder="Find a repository">
-      </p>
-      <p class="control">
-        <a class="button is-primary has-text-white is-medium">
-          Create
-        </a>
-      </p>
+
+
+    <input #listTitleInput class="input is-primary has-background-light is-medium" type="text" placeholder="Enter List Name...">
+    <br>
+    <br>
+    <div class="buttons is-right">
+      <button class="button is-medium" routerLink="/">Cancel</button>
+      <button class="button is-primary has-text-white is-medium" (click)="createList(listTitleInput.value)">Create</button>
     </div>
 
-    <button routerLink="/" class="button" style="margin-top: 20px;">Go Back</button>
 
   </div>
 </div>

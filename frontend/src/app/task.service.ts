@@ -6,10 +6,10 @@ import { WebRequestService } from './web-request.service';
 })
 export class TaskService {
 
-  constructor(private webReqService: WebRequestService) {}
+  constructor(private webReqService: WebRequestService) { }
 
   createList(title: string) {
-    // This Should Send a Web Request to Create a List
-    return this.webReqService.post(`lists`, { title });
+    // This Should Send a Web Request to Create a New List
+    return this.webReqService.post('lists', { title });
   }
 }

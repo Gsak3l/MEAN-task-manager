@@ -12,4 +12,8 @@ export class TaskService {
     // This Should Send a Web Request to Create a New List
     return this.webReqService.post('lists', { title });
   }
+
+  getLists() {
+    return this.webReqService.get('lists');
+  }
 }

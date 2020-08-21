@@ -1,17 +1,17 @@
 <div class="centered-content">
   <div class="modal-box">
     <h1 class="title">
-      Create a new List
+      Create a new Task
     </h1>
 
-    <input #listTitleInput class="input is-primary has-background-light is-medium" type="text"
-      placeholder="Enter List Name...">
+    <input #taskTitleInput class="input is-primary has-background-light is-medium" type="text"
+      placeholder="Enter Task Name...">
     <br>
     <br>
     <div class="buttons is-right">
       <button class="button is-medium" routerLink="/">Cancel</button>
       <button class="button is-primary has-text-white is-medium"
-        (click)="createList(listTitleInput.value)">Create</button>
+        (click)="createTask(taskTitleInput.value)">Create</button>
     </div>
 
   </div>

@@ -4,6 +4,7 @@
 
 // Task Manager Container
 .task-manager-container {
+  position: relative;
   display: flex;
   width: 100%;
   height: 100%;
@@ -91,4 +92,15 @@
     text-decoration: line-through;
     opacity: 0.8;
   }
+}
+
+
+// Bytton that Adds new List
+.circle-add-button {
+  position: absolute;
+  bottom: 35px;
+  right: 35px;
+  height: 50px;
+  width: 50px;
+  border-radius: 50%;
 }

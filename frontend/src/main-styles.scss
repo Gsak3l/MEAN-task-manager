@@ -11,7 +11,8 @@ $light: #f8f8f8;
 $dark_green: #006450;
 
 // Updating Bulma's Global Variables
-$family-sans-serif: "Nunito", sans-serif;
+$family-sans-serif: "Nunito",
+sans-serif;
 $primary: $green;
 $link: $light_green;
 
@@ -48,4 +49,11 @@ body {
   background: #fff;
   border-radius: 5px;
   padding: 35px;
+}
+
+// global title style
+.title {
+  font-size: 24px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
 }

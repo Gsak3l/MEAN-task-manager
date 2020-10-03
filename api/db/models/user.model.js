@@ -33,6 +33,7 @@ const UserSchema = new mongoose.Schema({
 });
 
 // ----- Instance Methods ----- //
+
 UserSchema.methods.toJSON = function () {
     const user = this;
     const userObject = user.toObject();
@@ -74,16 +75,42 @@ UserSchema.methods.generateRefreshAuthToken = function () {
     });
 };
 
+
+UserSchema.methods.createSession = function () {
+    let user = this;
+
+    return user.generateRefreshAuthToken().then((refreshToken) => {
+        saveSessionToDatabase(user, refreshToken);
+    }).then((refreshToken) => {
+        // saved to database successfully
+        // now return the refresh token
+        return refreshToken;
+    }).catch((e) => {
+        return Promise.reject('Failed to save session to database.\n');
+    });
+};
+
+
+
+
+// ----- Helper Methods ----- //
+
 let saveSessionToDatabase = (user, refreshToken) => {
     // Save the session to the Database
     return new Promise((resolve, reject) => {
         let expiresAt = generateRefreshTokenExpiryTime();
         // this takes the user document and push this object to the sessions array
-        // this took me about 45 minutes to figure it out😊
+        // this took me about 45 minutes to figure it out 😊
         user.sessions.push({
             'token': refreshToken,
             expiresAt
-        })
+        });
+        user.save().then(() => {
+            // saved session successfully
+            return resolve(refreshToken);
+        }).catch((e) => {
+            reject(e)
+        });
     })
 };
 

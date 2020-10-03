@@ -2,6 +2,11 @@ const mongoose = require('mongoose');
 const _ = require('lodash');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
+const bcrypt = require('bcryptjs');
+const {
+    has, reject
+} = require('lodash');
+const { resolve } = require('path');
 
 // JWT Secret
 const jwtSecret = "2soqdpwnbbdAcOhPgMjlTz7BXLb6DPXh2IzJpe6jFXKfdq9IouX8NBoAyaGD";
@@ -91,7 +96,60 @@ UserSchema.methods.createSession = function () {
 };
 
 
+// ----- Model Methods (static methods) ----- //
 
+UserSchema.statics.findByIdAndToken = function (_id, token) {
+    // finds user by id and token
+    // used in auth middleware (verifySession)
+
+    const User = this;
+
+    return User.findOne({
+        _id,
+        'session.token': token
+    });
+};
+
+UserSchema.statics.findByCredentials = function (email, password) {
+    let User = this;
+    return User.findOne({email}).then((user) => {
+        if(!user) {
+            return Promise.reject();
+
+            return new Promise((resolve, reject) => {
+                bcrypt.compare(password, user.password, (err, res) => {
+                    if(res) {
+                        resolve(user);
+                    } else {
+                        reject();
+                    }
+                })
+            });
+        }
+    })
+};
+
+
+// ----- Middleware ----- //
+// before a user document is saved, this code runs
+UserSchema.pre('save', function (next) {
+    let user = this;
+    let costFactor = 10; // number of hashing rounds
+
+    if (user.isModified('password')) {
+        // if the password field has been changed, then run this code
+
+        // generate salt and hash password
+        bcrypt.genSalt(costFactor, (err, salt) => {
+            bcrypt.hash(user.password, salt, (err, hash) => {
+                user.password = hash;
+                next();
+            })
+        })
+    } else {
+        next();
+    }
+});
 
 // ----- Helper Methods ----- //
 

@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const _ = require('lodash');
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
 
 // JWT Secret
 const jwtSecret = "2soqdpwnbbdAcOhPgMjlTz7BXLb6DPXh2IzJpe6jFXKfdq9IouX8NBoAyaGD";
@@ -55,6 +56,39 @@ UserSchema.methods.generateAccessAuthToken = function () {
                 // In case there is an error
                 reject();
             }
-        }));
+        }))
+    })
+};
+
+UserSchema.methods.generateRefreshAuthToken = function () {
+    // This method simply generates a 64byte hex string
+    // Tt doesn't save it to the database, saveSessionToDatabase() does that
+    return new Promise((resolve, reject) => {
+        crypto.randomBytes(64, (err, buf) => {
+            if (!err) {
+                // no error
+                let token = buf.toString('hex');
+                return resolve(token);
+            }
+        })
     });
+};
+
+let saveSessionToDatabase = (user, refreshToken) => {
+    // Save the session to the Database
+    return new Promise((resolve, reject) => {
+        let expiresAt = generateRefreshTokenExpiryTime();
+        // this takes the user document and push this object to the sessions array
+        // this took me about 45 minutes to figure it out😊
+        user.sessions.push({
+            'token': refreshToken,
+            expiresAt
+        })
+    })
+};
+
+const generateRefreshTokenExpiryTime = () => {
+    let daysUntilExpire = "10";
+    let secondUntilExpire = ((daysUntilExpire * 24) * 60) * 60;
+    return ((Date.now() / 1000) + secondUntilExpire);
 };

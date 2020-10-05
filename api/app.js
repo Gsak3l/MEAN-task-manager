@@ -139,8 +139,7 @@ app.delete('/lists/:listId/tasks/:taskId', (req, res) => {
 /*==========USER ROUTES==========*/
 
 // POST /users → Sign Up
-app.post('users', (req, res) => {
-
+app.post('/users', (req, res) => {
     let body = req.body;
     let newUser = new User(body);
 
@@ -153,16 +152,47 @@ app.post('users', (req, res) => {
             return {
                 accessToken,
                 refreshToken
-            };
-        }).then((authToken) => {
-            // Constructing and Sending the Response to the User
-            // with their Auth Tokens in the Header and the User Objects in the Body
-            res.header('x-refresh-token', authTokens.refreshToken)
-                .header('x-access-token', authTokens.accessToken)
-                .send(newUser);
-        }).catch((e) => {
-            res.status(400).send(e);
-        })
+            }
+        });
+    }).then((authTokens) => {
+        // Constructing and Sending the Response to the User
+        // with their Auth Tokens in the Header and the User Objects in the Body
+        res
+            .header('x-refresh-token', authTokens.refreshToken)
+            .header('x-access-token', authTokens.accessToken)
+            .send(newUser);
+    }).catch((e) => {
+        res.status(400).send(e);
+    })
+})
+
+
+// POST /users/login → Login
+app.post('/users', (req, res) => {
+
+    let body = req.body;
+    let newUser = new User(body);
+
+    newUser.save().then(() => {
+        return newUser.createSession();
+    }).then((refreshToken) => {
+        // Constructing and Sending the Response to the User
+        // with their Auth Tokens in the Header and the User Objects in the Body
+        return newUser.generateAccessAuthToken().then((accessToken) => {
+            return {
+                accessToken,
+                refreshToken
+            }
+        });
+    }).then((authTokens) => {
+        // Session has beed Created Successfully - refreshToken Returned
+            // Generating an Access Auth Token for the User
+        res
+            .header('x-refresh-token', authTokens.refreshToken)
+            .header('x-access-token', authTokens.accessToken)
+            .send(newUser);
+    }).catch((e) => {
+        res.status(400).send(e);
     })
 })
 

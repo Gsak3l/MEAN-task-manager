@@ -3,13 +3,7 @@ const _ = require('lodash');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
-const {
-    has,
-    reject
-} = require('lodash');
-const {
-    resolve
-} = require('path');
+
 
 // JWT Secret
 const jwtSecret = "2soqdpwnbbdAcOhPgMjlTz7BXLb6DPXh2IzJpe6jFXKfdq9IouX8NBoAyaGD";
@@ -40,6 +34,7 @@ const UserSchema = new mongoose.Schema({
     }]
 });
 
+
 // ----- Instance Methods ----- //
 
 UserSchema.methods.toJSON = function () {
@@ -58,16 +53,16 @@ UserSchema.methods.generateAccessAuthToken = function () {
             _id: user._id.toHexString()
         }, jwtSecret, {
             expiresIn: "15m"
-        }, (err, token => {
+        }, (err, token) => {
             if (!err) {
                 resolve(token);
             } else {
-                // In case there is an error
+                // there is an error
                 reject();
             }
-        }))
+        })
     })
-};
+}
 
 UserSchema.methods.generateRefreshAuthToken = function () {
     // This method simply generates a 64byte hex string
@@ -77,29 +72,36 @@ UserSchema.methods.generateRefreshAuthToken = function () {
             if (!err) {
                 // no error
                 let token = buf.toString('hex');
+
                 return resolve(token);
             }
         })
-    });
-};
-
+    })
+}
 
 UserSchema.methods.createSession = function () {
     let user = this;
 
     return user.generateRefreshAuthToken().then((refreshToken) => {
-        saveSessionToDatabase(user, refreshToken);
+        return saveSessionToDatabase(user, refreshToken);
     }).then((refreshToken) => {
         // saved to database successfully
         // now return the refresh token
         return refreshToken;
     }).catch((e) => {
-        return Promise.reject('Failed to save session to database.\n');
-    });
-};
+        return Promise.reject('Failed to save session to database.\n' + e);
+    })
+}
+
 
 
 // ----- Model Methods (static methods) ----- //
+
+UserSchema.statics.getJWTSecret = () => {
+    return jwtSecret;
+}
+
+
 
 UserSchema.statics.findByIdAndToken = function (_id, token) {
     // finds user by id and token
@@ -109,39 +111,40 @@ UserSchema.statics.findByIdAndToken = function (_id, token) {
 
     return User.findOne({
         _id,
-        'session.token': token
+        'sessions.token': token
     });
-};
+}
+
 
 UserSchema.statics.findByCredentials = function (email, password) {
     let User = this;
     return User.findOne({
         email
     }).then((user) => {
-        if (!user) {
-            return Promise.reject();
+        if (!user) return Promise.reject();
 
-            return new Promise((resolve, reject) => {
-                bcrypt.compare(password, user.password, (err, res) => {
-                    if (res) {
-                        resolve(user);
-                    } else {
-                        reject();
-                    }
-                })
-            });
-        }
+        return new Promise((resolve, reject) => {
+            bcrypt.compare(password, user.password, (err, res) => {
+                if (res) {
+                    resolve(user);
+                } else {
+                    reject();
+                }
+            })
+        })
     })
-};
+}
 
 UserSchema.statics.hasRefreshTokenExpired = (expiresAt) => {
     let secondsSinceEpoch = Date.now() / 1000;
     if (expiresAt > secondsSinceEpoch) {
+        // hasn't expired
         return false;
     } else {
+        // has expired
         return true;
     }
-};
+}
 
 
 // ----- Middleware ----- //
@@ -149,7 +152,7 @@ UserSchema.statics.hasRefreshTokenExpired = (expiresAt) => {
 // before a user document is saved, this code runs
 UserSchema.pre('save', function (next) {
     let user = this;
-    let costFactor = 10; // number of hashing rounds
+    let costFactor = 10;
 
     if (user.isModified('password')) {
         // if the password field has been changed, then run this code
@@ -166,6 +169,7 @@ UserSchema.pre('save', function (next) {
     }
 });
 
+
 // ----- Helper Methods ----- //
 
 let saveSessionToDatabase = (user, refreshToken) => {
@@ -178,22 +182,23 @@ let saveSessionToDatabase = (user, refreshToken) => {
             'token': refreshToken,
             expiresAt
         });
+
         user.save().then(() => {
             // saved session successfully
             return resolve(refreshToken);
         }).catch((e) => {
-            reject(e)
+            reject(e);
         });
     })
-};
+}
 
-const generateRefreshTokenExpiryTime = () => {
+let generateRefreshTokenExpiryTime = () => {
     let daysUntilExpire = "10";
-    let secondUntilExpire = ((daysUntilExpire * 24) * 60) * 60;
-    return ((Date.now() / 1000) + secondUntilExpire);
-};
+    let secondsUntilExpire = ((daysUntilExpire * 24) * 60) * 60;
+    return ((Date.now() / 1000) + secondsUntilExpire);
+}
 
-const User = mongoose.model('user', UserSchema);
+const User = mongoose.model('User', UserSchema);
 
 module.exports = {
     User

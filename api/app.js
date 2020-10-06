@@ -12,7 +12,43 @@ const {
     Task,
     User
 } = require('./db/models');
-const taskModel = require('./db/models/task.model');
+
+/*==========Middleware==========*/
+
+// Verify Refresh Token Middleware (which will be verifying the session)
+app.use((req, res, next) => {
+    // Getting the Refresh Token from the Request Header
+    let refreshToken = req.header('x-refresh-token');
+
+    // Getting the _id from the Request Header
+    let _id = req.header('_id');
+
+    User.findByIdAndToken(_id, token).then((user) => {
+        if (!user) {
+            // Unable to Locate the User
+            return Promise.reject({
+                'error': 'User not found. Make sure that the refresh token and user id are correct.'
+            })
+        }
+        // The User was Found
+        // Therefore the Session is Valid
+        req.user_id = user._id;
+        req.refreshToken = refreshToken;
+
+        let isSessionValid = false;
+
+        user.sessions.forEach((session) => {
+            if(session.token === refreshToken) {
+                // Checking if the Session has Expired
+                if(User.hasRefreshTokenExpired(session.expiresAt) === false) {
+                    // Refresh Token has not Expired
+                    isSessionValid = true;
+                }
+            }
+        })
+    });
+});
+
 
 // Load Middleware
 app.use(body_parser.json());
@@ -140,6 +176,7 @@ app.delete('/lists/:listId/tasks/:taskId', (req, res) => {
 
 // POST /users → Sign Up
 app.post('/users', (req, res) => {
+
     let body = req.body;
     let newUser = new User(body);
 
@@ -163,38 +200,43 @@ app.post('/users', (req, res) => {
             .send(newUser);
     }).catch((e) => {
         res.status(400).send(e);
-    })
-})
+    });
+});
 
 
 // POST /users/login → Login
-app.post('/users', (req, res) => {
+app.post('/users/login', (req, res) => {
 
-    let body = req.body;
-    let newUser = new User(body);
+    let email = req.body.email;
+    let password = req.body.password;
 
-    newUser.save().then(() => {
-        return newUser.createSession();
-    }).then((refreshToken) => {
-        // Constructing and Sending the Response to the User
-        // with their Auth Tokens in the Header and the User Objects in the Body
-        return newUser.generateAccessAuthToken().then((accessToken) => {
-            return {
-                accessToken,
-                refreshToken
-            }
-        });
-    }).then((authTokens) => {
-        // Session has beed Created Successfully - refreshToken Returned
+    User.findByCredentials(email, password).then((user) => {
+        return user.createSession().then((refreshToken) => {
+            // Session has beed Created Successfully - refreshToken Returned
             // Generating an Access Auth Token for the User
-        res
-            .header('x-refresh-token', authTokens.refreshToken)
-            .header('x-access-token', authTokens.accessToken)
-            .send(newUser);
+            return user.generateAccessAuthToken().then((accessToken) => {
+                return {
+                    accessToken,
+                    refreshToken
+                }
+            });
+        }).then((authTokens) => {
+            // Constructing and Sending the Response to the User
+            // with their Auth Tokens in the Header and the User Objects in the Body
+            res
+                .header('x-refresh-token', authTokens.refreshToken)
+                .header('x-access-token', authTokens.accessToken)
+                .send(user);
+        })
     }).catch((e) => {
         res.status(400).send(e);
-    })
-})
+    });
+});
+
+// GET /users/me/access-token → Generates and Returns an Access Token
+app.get('/users/me/access-token', (req, res) => {
+
+});
 
 
 /*==========OTHER STUFF, NO COMMENT FOR NOW==========*/

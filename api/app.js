@@ -16,7 +16,7 @@ const {
 /*==========Middleware==========*/
 
 // Verify Refresh Token Middleware (which will be verifying the session)
-app.use((req, res, next) => {
+let verifySession = (req, res, next) => {
     // Getting the Refresh Token from the Request Header
     let refreshToken = req.header('x-refresh-token');
 
@@ -31,23 +31,38 @@ app.use((req, res, next) => {
             })
         }
         // The User was Found
-        // Therefore the Session is Valid
+        // Therefore the Refresh Token Exists in the Database
+        // Checking if it has Expired or not
         req.user_id = user._id;
+        req.userObject = user;
         req.refreshToken = refreshToken;
 
         let isSessionValid = false;
 
         user.sessions.forEach((session) => {
-            if(session.token === refreshToken) {
+            if (session.token === refreshToken) {
                 // Checking if the Session has Expired
-                if(User.hasRefreshTokenExpired(session.expiresAt) === false) {
+                if (User.hasRefreshTokenExpired(session.expiresAt) === false) {
                     // Refresh Token has not Expired
                     isSessionValid = true;
                 }
             }
         })
-    });
-});
+
+        if (isSessionValid) {
+            // The Session is Valid - Call next() to Continue with Processing this Web Request
+            next();
+        } else {
+            // The Session is not Valid
+            return Promise.reject({
+                'error': 'Refresh token has expired or the session is invalid'
+            })
+        }
+
+    }).catch((e) => {
+        res.status(401).send(e);
+    })
+};
 
 
 // Load Middleware
@@ -234,8 +249,16 @@ app.post('/users/login', (req, res) => {
 });
 
 // GET /users/me/access-token → Generates and Returns an Access Token
-app.get('/users/me/access-token', (req, res) => {
-
+app.get('/users/me/access-token', verifySession, (req, res) => {
+    // Knowing that the User/Caller is Authenticated &
+    // Having the and the userObject user_id Available
+    req.userObject.generateAccessAuthToken().then((accessToken) => {
+        res.header('x-access-token', accessToken).send({
+            accessToken
+        });
+    }).catch((e) => {
+        res.status(400).send(e);
+    })
 });
 
 

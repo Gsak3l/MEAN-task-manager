@@ -33,4 +33,12 @@ export class WebRequestService {
     return this.http.delete(`${this.ROOT_URL}/${uri}`);
   };
 
+  // This is Used to Authenticate the User when trying to Login
+  login(email: string, password: string) {
+    return this.http.post(`$(this.ROOT_URL)/users/login`, {
+      email,
+      password
+    }, { observe: 'response' });
+  }
+
 }

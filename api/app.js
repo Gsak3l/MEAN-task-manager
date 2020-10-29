@@ -23,7 +23,7 @@ let verifySession = (req, res, next) => {
     // Getting the _id from the Request Header
     let _id = req.header('_id');
 
-    User.findByIdAndToken(_id, token).then((user) => {
+    User.findByIdAndToken(_id, refreshToken).then((user) => {
         if (!user) {
             // Unable to Locate the User
             return Promise.reject({

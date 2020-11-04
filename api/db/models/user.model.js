@@ -6,9 +6,8 @@ const bcrypt = require('bcryptjs');
 
 
 // JWT Secret
-const jwtSecret = "2soqdpwnbbdAcOhPgMjlTz7BXLb6DPXh2IzJpe6jFXKfdq9IouX8NBoAyaGD";
+const jwtSecret = "51778657246321226641fsdklafjasdkljfsklfjd7148924065";
 
-// ----- User Schema ----- //
 const UserSchema = new mongoose.Schema({
     email: {
         type: String,
@@ -35,13 +34,13 @@ const UserSchema = new mongoose.Schema({
 });
 
 
-// ----- Instance Methods ----- //
+// *** Instance methods ***
 
 UserSchema.methods.toJSON = function () {
     const user = this;
     const userObject = user.toObject();
 
-    // return the document except the password and sessions (we should keep these private)
+    // return the document except the password and sessions (these shouldn't be made available)
     return _.omit(userObject, ['password', 'sessions']);
 }
 
@@ -49,11 +48,7 @@ UserSchema.methods.generateAccessAuthToken = function () {
     const user = this;
     return new Promise((resolve, reject) => {
         // Create the JSON Web Token and return that
-        jwt.sign({
-            _id: user._id.toHexString()
-        }, jwtSecret, {
-            expiresIn: "15m"
-        }, (err, token) => {
+        jwt.sign({ _id: user._id.toHexString() }, jwtSecret, { expiresIn: "15m" }, (err, token) => {
             if (!err) {
                 resolve(token);
             } else {
@@ -65,8 +60,7 @@ UserSchema.methods.generateAccessAuthToken = function () {
 }
 
 UserSchema.methods.generateRefreshAuthToken = function () {
-    // This method simply generates a 64byte hex string
-    // Tt doesn't save it to the database, saveSessionToDatabase() does that
+    // This method simply generates a 64byte hex string - it doesn't save it to the database. saveSessionToDatabase() does that.
     return new Promise((resolve, reject) => {
         crypto.randomBytes(64, (err, buf) => {
             if (!err) {
@@ -95,7 +89,7 @@ UserSchema.methods.createSession = function () {
 
 
 
-// ----- Model Methods (static methods) ----- //
+/* MODEL METHODS (static methods) */
 
 UserSchema.statics.getJWTSecret = () => {
     return jwtSecret;
@@ -118,16 +112,15 @@ UserSchema.statics.findByIdAndToken = function (_id, token) {
 
 UserSchema.statics.findByCredentials = function (email, password) {
     let User = this;
-    return User.findOne({
-        email
-    }).then((user) => {
+    return User.findOne({ email }).then((user) => {
         if (!user) return Promise.reject();
 
         return new Promise((resolve, reject) => {
             bcrypt.compare(password, user.password, (err, res) => {
                 if (res) {
                     resolve(user);
-                } else {
+                }
+                else {
                     reject();
                 }
             })
@@ -147,17 +140,16 @@ UserSchema.statics.hasRefreshTokenExpired = (expiresAt) => {
 }
 
 
-// ----- Middleware ----- //
-
-// before a user document is saved, this code runs
+/* MIDDLEWARE */
+// Before a user document is saved, this code runs
 UserSchema.pre('save', function (next) {
     let user = this;
     let costFactor = 10;
 
     if (user.isModified('password')) {
-        // if the password field has been changed, then run this code
+        // if the password field has been edited/changed then run this code.
 
-        // generate salt and hash password
+        // Generate salt and hash password
         bcrypt.genSalt(costFactor, (err, salt) => {
             bcrypt.hash(user.password, salt, (err, hash) => {
                 user.password = hash;
@@ -170,18 +162,13 @@ UserSchema.pre('save', function (next) {
 });
 
 
-// ----- Helper Methods ----- //
-
+/* HELPER METHODS */
 let saveSessionToDatabase = (user, refreshToken) => {
-    // Save the session to the Database
+    // Save session to database
     return new Promise((resolve, reject) => {
         let expiresAt = generateRefreshTokenExpiryTime();
-        // this takes the user document and push this object to the sessions array
-        // this took me about 45 minutes to figure it out 😊
-        user.sessions.push({
-            'token': refreshToken,
-            expiresAt
-        });
+
+        user.sessions.push({ 'token': refreshToken, expiresAt });
 
         user.save().then(() => {
             // saved session successfully
@@ -200,6 +187,4 @@ let generateRefreshTokenExpiryTime = () => {
 
 const User = mongoose.model('User', UserSchema);
 
-module.exports = {
-    User
-};
+module.exports = { User }

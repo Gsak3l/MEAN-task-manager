@@ -1,5 +1,4 @@
-// Importing Bulma
-@import '../node_modules/bulma/bulma.sass';
+/* You can add global styles to this file, and also import other style files */
 
-// Importing mmain-styles.scss
-@import 'main-styles'
+@import 'main-styles';
+@import '../node_modules/bulma/bulma.sass';

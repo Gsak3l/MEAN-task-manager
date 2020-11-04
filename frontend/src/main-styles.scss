@@ -1,59 +1,70 @@
-// Global Styles and Variale Names
+// This is where we put global styles and change variable values
 
-// Importing Font"
-@import url("https://fonts.googleapis.com/css2?family=Nunito:ital@0;1&display=swap");
+// Import Fonts (Lato and Nunito)
+@import url('https://fonts.googleapis.com/css?family=Lato:400,700|Nunito:400,700');
 
-// Colors
 $turquoise: #44ddd0;
 $green: #27d7a1;
-$light_green: #45f69e;
+$light-green: #45f69e; 
+$dark-green: rgb(0, 100, 80);
+
 $light: #f8f8f8;
-$dark_green: #006450;
 
-// Updating Bulma's Global Variables
-$family-sans-serif: "Nunito",
-sans-serif;
+
+// Update Bulma's global variables
+$family-sans-serif: "Nunito", sans-serif;
 $primary: $green;
-$link: $light_green;
 
-// Updating Some of Bulma's Component Variables
+$link: $turquoise;
+
+
+// Update some of Bulma's component variables
+
 $control-border-width: 2px;
 $input-border-color: transparent;
 $input-shadow: none;
 
-// Setting Custom Global Styles
+
+// Set custom global styles (will be applied to whole app)
+
 html {
-  background: linear-gradient(to right top, $turquoise, $green);
+    background: linear-gradient(to right top, $turquoise, $green);
 }
 
-html,
-body {
-  height: 100%;
+html, body {
+    height: 100%;
 }
 
-
-// Centered Content Style
 .centered-content {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
 }
 
-// Box for the New Forms
 .modal-box {
-  min-height: 200px;
-  width: 100%;
-  max-width: 580px;
-  background: #fff;
-  border-radius: 5px;
-  padding: 35px;
+    min-height: 200px;
+    width: 100%;
+    max-width: 580px;
+    background: white;
+    border-radius: 5px;
+    padding: 35px;
 }
 
-// global title style
 .title {
-  font-size: 24px;
-  text-transform: uppercase;
-  letter-spacing: 2px;
+    font-family: 'Lato';
+    font-size: 24px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.white-box {
+    padding: 35px;
+    background: white;
+    border-radius: 5px;
+
+    width: 350px;
+    max-width: 350px;
+    
 }
